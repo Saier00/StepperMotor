@@ -57,6 +57,7 @@ void ASV(void);
 void Aswitch(char*,int8_t*);
 void PRS(void);
 int16_t ReadNum(char*,int8_t*);
+int16_t ReadNum0(char*);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -106,7 +107,7 @@ int main(void)
     //Write("3) ASV for saving algorithm in memory\n4) PRS for performing algorithm in memory\n");
     HAL_Delay(2000);
       
-    //COM("DRC");
+    //COM("APF");
     
     if(strncmp((char*)UserRxBufferFS,"DRC",3)==0)
     {
@@ -218,7 +219,7 @@ void DRC()
     while(1)
     {
         HAL_Delay(100);
-        //COM("MV1000");
+        //COM("HM");
         if(UserRxBufferFS[0]!=(uint8_t)'\0')
             break;
     }
@@ -234,7 +235,7 @@ void DRC()
                 switch(str[1])
                 {
                     case 'P':
-                        SPdc(ReadNum(str,0));
+                        SPdc(ReadNum0(str));
                         break;
                 }
                 break;
@@ -243,14 +244,14 @@ void DRC()
                 {
                     case 'V':
                         k=0;
-                        while('0'<str[2+k]&&str[2+k]<'9')
-                            k++;
+                        if('0'<=str[2+k]&&str[2+k]<='9')
+                            k=1;
                         if(k==0)
                         {
-                            MV();
+                            MVdc();
                             break;
                         }
-                        MVXdc(ReadNum(str,0));
+                        MVXdc(ReadNum0(str));
                         break;
                     case 'H':
                         MHdc();
@@ -270,7 +271,8 @@ void DRC()
                 break;
             //For parameter changing, LL-JP functions and WL/WH
             default:
-                Aswitch(str,0);
+                k=0;
+                Aswitch(str,&k);
                 break;
         }
     }
@@ -283,6 +285,7 @@ void APF()
     Write("\nInput your algorithm:\n");
     while(1)
     {
+        //COM("WH");
         HAL_Delay(100);
         if(UserRxBufferFS[0]!=(uint8_t)'\0')
             break;
@@ -354,8 +357,8 @@ void Aswitch(char* str,int8_t* i)
                 {
                     case 'V':
                         k=0;
-                        while('0'<str[*i+2+k]&&str[*i+2+k]<'9')
-                            k++;
+                        if('0'<=str[*i+2+k]&&str[*i+2+k]<='9')
+                            k=1;
                         if(k==0)
                         {
                             MV();
@@ -394,12 +397,22 @@ void Aswitch(char* str,int8_t* i)
                         break;
                 }
                 break;
+            case 'W':
+                switch(str[*i+1])
+                {
+                    case 'L':
+                        WL();
+                        break;
+                    case 'H':
+                        WH();
+                        break;
+                }
         }
 }
 
 extern void NoInterrupt(){
-    char str[12];
-    strncpy(str,(char*)UserRxBufferFS,12);
+    char str[64];
+    strncpy(str,(char*)UserRxBufferFS,64);
    
      switch(str[0])
         {
@@ -421,11 +434,21 @@ extern void NoInterrupt(){
 int16_t ReadNum(char* str,int8_t* i){
     int8_t k=0;
     char temp[10];
-    while(('0'<str[*i+2+k]&&str[*i+2+k]<'9')||str[*i+2+k]=='-'||str[*i+2+k]=='+')
+    while(('0'<=str[*i+2+k]&&str[*i+2+k]<='9')||str[*i+2+k]=='-'||str[*i+2+k]=='+')
         k++;
     for(int8_t j=0;j<k;j++)
         temp[j]=str[*i+2+j];
     *i+=k;
+    return atoi(temp);
+}
+
+int16_t ReadNum0(char* str){
+    int8_t k=0;
+    char temp[10];
+    while(('0'<=str[2+k]&&str[2+k]<='9')||str[2+k]=='-'||str[2+k]=='+')
+        k++;
+    for(int8_t j=0;j<k;j++)
+        temp[j]=str[2+j];
     return atoi(temp);
 }
 /* USER CODE END 4 */

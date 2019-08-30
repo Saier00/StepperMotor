@@ -160,21 +160,19 @@ void WH(){
 //Turn on motor + continuous motion
 extern void MVdc(){
     Debug("MVdc\n");
-    
+    uint8_t bc;
     cs=ss;
     while(1)
     {
-        if(BufferCheck())
+        bc=BufferCheck();
+        if(bc==1)
         {
-            if(BufferCheck()==1)
-            {
-                break;
-            }
-            if(BufferCheck()==2)
-            {
-                NoInterrupt();
-                continue;
-            }
+            break;
+        }
+        else if(bc==2)
+        {
+            NoInterrupt();
+            continue;
         }
         Step();
         Change();
@@ -184,20 +182,19 @@ extern void MVdc(){
 extern void MVXdc(uint32_t x){
     Debug("MVXdc\n");
     
+    uint8_t bc;
     cs=ss;
     for(uint8_t i=0;i<x;i++)
     {
-        if(BufferCheck())
+        bc=BufferCheck();
+        if(bc==1)
         {
-            if(BufferCheck()==1)
-            {
-                break;
-            }
-            if(BufferCheck()==2)
-            {
-                NoInterrupt();
-                continue;
-            }
+            break;
+        }
+        else if(bc==2)
+        {
+            NoInterrupt();
+            continue;
         }
         Step();
         Change();
@@ -245,7 +242,7 @@ extern void HMdc(){
 extern void SPdc(uint32_t x){
     Debug("SDdc\n");
     
-    for(int64_t i=0;i<x/100;i++){
+    for(int64_t i=0;i<(int64_t)(x/100);i++){
         HAL_Delay(100);
         if(BufferCheck()==1)
         {
@@ -255,7 +252,7 @@ extern void SPdc(uint32_t x){
 }
 //Private functions
 void Step(){
-    Debug("Step\n");
+    //Debug("Step\n");
     
     HAL_GPIO_WritePin(SPinSer,SPin,GPIO_PIN_SET);
     HAL_Delay(SMP/cs);

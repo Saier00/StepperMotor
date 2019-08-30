@@ -315,7 +315,7 @@ extern uint8_t Debug(char* msg)
 {
     return Write(msg);
 }
-extern uint8_t COM(char* msg){
+extern void COM(char* msg){
     strcpy((char*)UserRxBufferFS,msg);
 }
 

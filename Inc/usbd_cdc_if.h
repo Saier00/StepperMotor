@@ -109,7 +109,7 @@ uint8_t CDC_Transmit_FS(uint8_t* Buf, uint16_t Len);
 extern int8_t BufferCheck(void);
 extern uint8_t Write(char*);
 extern uint8_t Debug(char*);
-extern uint8_t COM(char*);
+extern void COM(char*);
 /* USER CODE END EXPORTED_FUNCTIONS */
 
 /**
